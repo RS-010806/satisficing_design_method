@@ -11,15 +11,21 @@ In the example, a regional health planner allocates mobile primary-care clinics 
 | File | Content |
 |---|---|
 | `inputs.json` | Every input with its value, unit, status (published, calculated, planning assumption or stakeholder requirement) and source |
-| `screening.py` | The three steps of the method: translation (Step 1), screening (Step 2) and decision records (Step 3) |
-| `recompute_from_records.py` | A separately written check that recomputes every measure and classification from `inputs.json`, compares them with each decision record, and checks every number of the example that we quote in the manuscript |
-| `make_figures.py` | Draws Figs. 1 to 3 of the manuscript |
-| `results/translation.csv` | 2030 population and monthly visits for each town (Table 5 and Appendix A) |
-| `results/screening.csv` | Capacity, coverage, unmet visits, cost and classification of every allocation in each of the three cases |
-| `results/decision_records.csv` | One decision record for each of the 35 allocations (Table 7 and Appendix B) |
+| `screening.py` | The three steps of the method: translation (Step 1), screening (Step 2) and decision records (Step 3), with the records exported in JSON, CSV and NDJSON |
+| `recompute_from_records.py` | A separately written check that recomputes every measure, check and classification from `inputs.json`, compares them with each decision record, checks that the JSON and NDJSON records hold the same content as the CSV records, and checks every number of the example that we quote in the manuscript |
+| `make_figures.py` | Draws Figures 1 to 6 of the manuscript |
+| `results/translation.csv` | 2030 population and monthly visits for each town (Table 5; Appendix A) |
+| `results/screening.csv` | Capacity, coverage, unmet visits, cost and classification of every allocation in each of the three cases (Appendix B) |
+| `results/decision_records.csv` | One decision record for each of the 35 allocations, for spreadsheet review (Table 7; Appendices B and D) |
+| `results/decision_records.json` | The same 35 decision records in JSON, for system integration (Appendix D) |
+| `results/decision_records.ndjson` | The same 35 decision records in NDJSON, one record per line, for streaming and batch processing (Appendix D) |
 | `results/sensitivity.csv` | Classifications for planning shares of 10, 15 and 20 percent (Appendix C) |
 | `results/summary.json` | The values that we quote in the text |
-| `figures/` | Figs. 1 to 3 |
+| `figures/` | Figures 1 to 6 |
+
+## Decision records in three formats
+
+In Step 3 of the method, the designer keeps a decision record for each candidate configuration: the inputs and their sources, the translation relations, the forecast bound used in each check, the result of each check, the fallback rule applied, the classification and the approver. We export the same content in three formats for downstream use: JSON for system integration, CSV for spreadsheet review and NDJSON for streaming and batch processing. We tie traceability to the content of the record, not to the format, and a designer can export the record in any other format.
 
 ## How to run
 
@@ -27,7 +33,7 @@ In the example, a regional health planner allocates mobile primary-care clinics 
 python screening.py                 # writes results/
 python recompute_from_records.py    # checks every record and every quoted number
 pip install -r requirements.txt     # only for the figures
-python make_figures.py              # writes figures/
+python make_figures.py              # writes figures/ (Figures 1 to 6)
 ```
 
 You need Python 3.8 or later. With `screening.py` and `recompute_from_records.py`, you use the Python standard library only; with `make_figures.py`, you also use matplotlib.

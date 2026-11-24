@@ -9,7 +9,8 @@ for 2030. We follow the three steps of the method:
   Step 1  Translate the published forecasts into the requirement measures (Eqs. (3) and (4)).
   Step 2  Screen every allocation at the central values and at the adverse end of each range,
           and apply the fallback rule that the stakeholders agreed in advance (Eqs. (1), (2)).
-  Step 3  Write a decision record for every allocation.
+  Step 3  Write a decision record for every allocation and export the same records in JSON, CSV
+          and NDJSON.
 
 In this script, we use only the Python standard library, read every input from inputs.json and
 write the results to results/. With every run, you obtain the same results.
@@ -20,7 +21,9 @@ Usage:  python screening.py
 import csv
 import itertools
 import json
+import math
 import os
+import re
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "results")
@@ -141,6 +144,29 @@ def reason(e, p):
     return "every requirement met"
 
 
+def failed_checks(e, p):
+    """The threshold checks that an allocation fails: cost, then critical and important coverage in each town."""
+    out = []
+    if e["cost"] > p["budget"]:
+        out.append("cost above the budget")
+    out += [f"critical coverage in {t}" for t in TOWNS if e["coverage"][t] < p["crit"]]
+    out += [f"important coverage in {t}" for t in TOWNS if e["coverage"][t] < p["imp"]]
+    return out
+
+
+def fallback_rule_text(p):
+    days = {5: "five"}.get(p["days"], str(p["days"]))
+    return (f"trigger: {math.ceil(p['cap'] / p['imp'])} or more visit requests in a month in Chickasha; action: the Anadarko "
+            f"clinic team serves Chickasha one of its {days} service days each week ({p['shift']:.1f} visits per month)")
+
+
+def compact_json(obj):
+    """JSON with an indent of two spaces, in which we keep each innermost object or list on one line."""
+    text = json.dumps(obj, indent=2)
+    inner = re.compile(r"([\{\[])\n([^\{\}\[\]]*?)\n\s*([\}\]])")
+    return inner.sub(lambda m: m.group(1) + " ".join(x.strip() for x in m.group(2).split("\n")) + m.group(3), text)
+
+
 def records(p, rows):
     out = []
     for r in rows:
@@ -154,13 +180,17 @@ def records(p, rows):
             "translation": "Eq. (4) with the 2030 population from the national growth factor or from Eq. (3)",
             "forecast_bounds_used": "adverse: higher 2030 population of each town and upper end of the visit rate",
             **{f"central_coverage_{t.lower().replace(' ', '_')}": round(c["coverage"][t], 6) for t in TOWNS},
+            "central_failed_checks": "; ".join(failed_checks(c, p)) or "none",
             "central_class": c["class"],
             **{f"adverse_coverage_{t.lower().replace(' ', '_')}": round(ad["coverage"][t], 6) for t in TOWNS},
             "adverse_unmet_total": round(ad["unmet_total"], 6),
+            "adverse_failed_checks": "; ".join(failed_checks(ad, p)) or "none",
             "adverse_class": ad["class"],
             "fallback_applied": "yes" if f["fallback_applied"] else "no",
+            "fallback_rule": fallback_rule_text(p) if f["fallback_applied"] else "none",
             **{f"fallback_coverage_{t.lower().replace(' ', '_')}": round(f["coverage"][t], 6) for t in TOWNS},
             "fallback_unmet_total": round(f["unmet_total"], 6),
+            "fallback_failed_checks": "; ".join(failed_checks(f, p)) or "none",
             "classification": final,
             "reason": reason(f, p),
             "approved_by": "stakeholders' planning committee (illustrative)",
@@ -182,6 +212,44 @@ def sensitivity(p):
                         "fallback_applied": "yes" if f["fallback_applied"] else "no",
                         "fallback_coverage_chickasha": round(f["coverage"]["Chickasha"], 6), "fallback_class": f["class"]})
     return out
+
+
+def nested(rec):
+    """The same decision record, nested for JSON and NDJSON."""
+    key = {"Anadarko": "anadarko", "Pauls Valley": "pauls_valley", "Chickasha": "chickasha"}
+    checks = lambda v: [] if v == "none" else v.split("; ")  # noqa: E731
+    return {
+        "allocation": rec["allocation"],
+        "vans": {t: rec[f"vans_{key[t]}"] for t in TOWNS},
+        "monthly_cost": rec["monthly_cost"],
+        "inputs_and_sources": rec["inputs_and_sources"],
+        "translation": rec["translation"],
+        "forecast_bounds_used": rec["forecast_bounds_used"],
+        "central": {"coverage": {t: rec[f"central_coverage_{key[t]}"] for t in TOWNS},
+                    "failed_checks": checks(rec["central_failed_checks"]), "class": rec["central_class"]},
+        "adverse": {"coverage": {t: rec[f"adverse_coverage_{key[t]}"] for t in TOWNS}, "unmet_total": rec["adverse_unmet_total"],
+                    "failed_checks": checks(rec["adverse_failed_checks"]), "class": rec["adverse_class"]},
+        "adverse_with_fallback": {"fallback_applied": rec["fallback_applied"] == "yes", "fallback_rule": rec["fallback_rule"],
+                                  "coverage": {t: rec[f"fallback_coverage_{key[t]}"] for t in TOWNS},
+                                  "unmet_total": rec["fallback_unmet_total"],
+                                  "failed_checks": checks(rec["fallback_failed_checks"])},
+        "classification": rec["classification"],
+        "reason": rec["reason"],
+        "approved_by": rec["approved_by"],
+    }
+
+
+def write_json_and_ndjson(recs):
+    docs = [nested(r) for r in recs]
+    with open(os.path.join(OUT, "decision_records.json"), "w") as f:
+        f.write(compact_json({"schema_version": "1.0",
+                              "description": "Decision records of the worked example in Section 3.4 of the manuscript, one for each "
+                                             "of the 35 allocations; we provide the same records in decision_records.csv and "
+                                             "decision_records.ndjson.",
+                              "records": docs}) + "\n")
+    with open(os.path.join(OUT, "decision_records.ndjson"), "w") as f:
+        for d in docs:
+            f.write(json.dumps(d, separators=(",", ":")) + "\n")
 
 
 def write_csv(name, rows):
@@ -210,7 +278,9 @@ def main():
                          "unmet_total": round(e["unmet_total"], 6),
                          "fallback_applied": "yes" if e["fallback_applied"] else "no", "class": e["class"]})
     write_csv("screening.csv", flat)
-    write_csv("decision_records.csv", records(p, rows))
+    recs = records(p, rows)
+    write_csv("decision_records.csv", recs)
+    write_json_and_ndjson(recs)
     write_csv("sensitivity.csv", sensitivity(p))
 
     counts = {case: {k: sum(1 for r in rows if r[case]["class"] == k) for k in ("Accepted", "Flagged", "Rejected")}

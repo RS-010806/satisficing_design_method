@@ -6,6 +6,8 @@ We wrote this script separately from screening.py and do not import it. With thi
   2. compare them with each decision record in results/decision_records.csv, and
   3. check every number of the example that we quote in the manuscript.
 
+  4. check that we keep the same content in the JSON, NDJSON and CSV records.
+
 This is an internal check by the authors, not a test with independent analysts.
 
 Usage:  python screening.py            (writes results/)
@@ -118,6 +120,32 @@ for r in recs:
     check(f"{tag} adverse class", r["adverse_class"] == lab_a, f"{r['adverse_class']} vs {lab_a}")
     check(f"{tag} fallback applied", r["fallback_applied"] == ("yes" if moved else "no"), r["fallback_applied"])
     check(f"{tag} final class", r["classification"].split(",")[0] == lab_f, f"{r['classification']} vs {lab_f}")
+    for name, cov, cost_ in (("central", cov_c, cost), ("adverse", cov_a, cost), ("fallback", cov_f, cost)):
+        want = (["cost above the budget"] if cost_ > budget else []) + \
+               [f"critical coverage in {t}" for t in TOWNS if cov[t] < crit] + \
+               [f"important coverage in {t}" for t in TOWNS if cov[t] < imp]
+        check(f"{tag} {name} failed checks", r[f"{name}_failed_checks"] == ("; ".join(want) or "none"), r[f"{name}_failed_checks"])
+
+# ---------------------------------------------------------------- the same records in JSON and NDJSON
+with open(os.path.join(HERE, "results", "decision_records.json")) as f:
+    docs = json.load(f)["records"]
+with open(os.path.join(HERE, "results", "decision_records.ndjson")) as f:
+    lines = [json.loads(x) for x in f if x.strip()]
+check("JSON and NDJSON records", len(docs) == len(lines) == len(recs), f"{len(docs)}, {len(lines)}, {len(recs)}")
+for r, d, n in zip(recs, docs, lines):
+    tag = r["allocation"]
+    check(f"{tag} NDJSON record equals JSON record", d == n)
+    check(f"{tag} JSON allocation", d["allocation"] == tag)
+    check(f"{tag} JSON cost", d["monthly_cost"] == int(r["monthly_cost"]))
+    for t in TOWNS:
+        close(f"{tag} JSON central coverage {t}", d["central"]["coverage"][t], float(r[f"central_coverage_{key[t]}"]))
+        close(f"{tag} JSON adverse coverage {t}", d["adverse"]["coverage"][t], float(r[f"adverse_coverage_{key[t]}"]))
+        close(f"{tag} JSON fallback coverage {t}", d["adverse_with_fallback"]["coverage"][t], float(r[f"fallback_coverage_{key[t]}"]))
+    check(f"{tag} JSON classes", (d["central"]["class"], d["adverse"]["class"], d["classification"]) ==
+          (r["central_class"], r["adverse_class"], r["classification"]))
+    check(f"{tag} JSON fallback", d["adverse_with_fallback"]["fallback_applied"] == (r["fallback_applied"] == "yes"))
+    for name, part in (("central", "central"), ("adverse", "adverse"), ("fallback", "adverse_with_fallback")):
+        check(f"{tag} JSON {name} failed checks", ("; ".join(d[part]["failed_checks"]) or "none") == r[f"{name}_failed_checks"])
 
 # ---------------------------------------------------------------- numbers quoted in the manuscript
 ch_now = I["towns"]["Chickasha"]["population_2025"]
