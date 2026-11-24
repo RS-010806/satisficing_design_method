@@ -1,0 +1,13 @@
+share,allocation,central_coverage_chickasha,central_class,adverse_coverage_chickasha,adverse_class,fallback_applied,fallback_coverage_chickasha,fallback_class
+0.1,"(1, 1, 1)",1.0,Accepted,1.0,Accepted,no,1.0,Accepted
+0.1,"(2, 1, 1)",1.0,Accepted,1.0,Accepted,no,1.0,Accepted
+0.1,"(1, 2, 1)",1.0,Accepted,1.0,Accepted,no,1.0,Accepted
+0.1,"(1, 1, 2)",1.0,Accepted,1.0,Accepted,no,1.0,Accepted
+0.15,"(1, 1, 1)",0.813503,Accepted,0.692649,Flagged,yes,0.831179,Accepted
+0.15,"(2, 1, 1)",0.813503,Accepted,0.692649,Flagged,yes,0.831179,Accepted
+0.15,"(1, 2, 1)",0.813503,Accepted,0.692649,Flagged,yes,0.831179,Accepted
+0.15,"(1, 1, 2)",1.0,Accepted,1.0,Accepted,no,1.0,Accepted
+0.2,"(1, 1, 1)",0.610127,Flagged,0.519487,Flagged,yes,0.623384,Flagged
+0.2,"(2, 1, 1)",0.610127,Flagged,0.519487,Flagged,yes,0.623384,Flagged
+0.2,"(1, 2, 1)",0.610127,Flagged,0.519487,Flagged,yes,0.623384,Flagged
+0.2,"(1, 1, 2)",1.0,Accepted,1.0,Accepted,no,1.0,Accepted

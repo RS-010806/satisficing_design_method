@@ -1,0 +1,4 @@
+town,population_2025,estimates_base_2020,change_2020_2025,population_2030_central,local_trend_factor,population_2030_local_trend,population_2030_adverse,adverse_population_source,visits_month_central,visits_month_adverse,visits_month_adverse_population_only,visits_month_adverse_rate_only
+Anadarko,5448,5744,-0.051532,5579.370941,0.950861,5180.28824,5579.370941,national growth,112.563809,125.549795,112.563809,125.549795
+Pauls Valley,6157,6042,0.019033,6305.46749,1.018119,6268.558178,6305.46749,national growth,127.212807,141.888782,127.212807,141.888782
+Chickasha,17313,15994,0.082468,17730.47891,1.078391,18670.19034,18670.19034,local trend,357.712412,420.125958,376.67109,398.980102

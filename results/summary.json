@@ -1,0 +1,58 @@
+{
+ "national_growth_factor": 1.0241136088581213,
+ "visit_rate_adverse": 1.8002,
+ "van_capacity_per_month": 291,
+ "van_cost_per_month": 81758,
+ "allocations": 35,
+ "counts": {
+  "central": {
+   "Accepted": 4,
+   "Flagged": 0,
+   "Rejected": 31
+  },
+  "adverse": {
+   "Accepted": 1,
+   "Flagged": 3,
+   "Rejected": 31
+  },
+  "adverse_fallback": {
+   "Accepted": 4,
+   "Flagged": 0,
+   "Rejected": 31
+  }
+ },
+ "threshold_checks": 490,
+ "chickasha_central_chain": {
+  "population_2030": 17730.478910160655,
+  "visits_year": 28616.992960999298,
+  "visits_year_mobile": 4292.548944149895,
+  "visits_month": 357.71241201249126
+ },
+ "allocation_111": {
+  "central": {
+   "class": "Accepted",
+   "coverage_chickasha": 0.81350266367005,
+   "unmet_total": 66.71241201249126
+  },
+  "adverse": {
+   "class": "Flagged",
+   "coverage_chickasha": 0.6926494170802826,
+   "unmet_total": 129.12595813138637
+  },
+  "adverse_fallback": {
+   "class": "Accepted",
+   "coverage_chickasha": 0.8311793004963391,
+   "unmet_total": 70.92595813138638
+  }
+ },
+ "added_cost_fourth_van": 81758,
+ "added_cost_share": 0.3333333333333333,
+ "chickasha_one_van_coverage": {
+  "central": 0.81350266367005,
+  "adverse_population_only": 0.7725572990259756,
+  "adverse_rate_only": 0.7293596817928346,
+  "adverse": 0.6926494170802826
+ },
+ "fallback_trigger_one_van": 363.75,
+ "fallback_shift": 58.2
+}

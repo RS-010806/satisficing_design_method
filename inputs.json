@@ -1,0 +1,83 @@
+{
+  "about": "Inputs of the worked example in Section 3.4 of the manuscript: mobile primary-care clinics for three Oklahoma towns in 2030. Status is one of: published, calculated in screening.py, planning assumption, or stakeholder requirement.",
+  "us_population": {
+    "2025": 347275808,
+    "2030": 355649881,
+    "unit": "persons, 1 July of each year",
+    "status": "published",
+    "source": "United Nations, Department of Economic and Social Affairs, Population Division (2024) World Population Prospects 2024, medium variant, total population of the United States of America",
+    "url": "https://population.un.org/wpp/"
+  },
+  "towns": {
+    "Anadarko": {"population_2025": 5448, "estimates_base_2020": 5744},
+    "Pauls Valley": {"population_2025": 6157, "estimates_base_2020": 6042},
+    "Chickasha": {"population_2025": 17313, "estimates_base_2020": 15994},
+    "unit": "persons; population_2025 on 1 July 2025 and estimates_base_2020 on 1 April 2020",
+    "status": "published",
+    "source": "U.S. Census Bureau (2026) QuickFacts, Vintage 2025: Population estimates, July 1, 2025, and Population estimates base, April 1, 2020",
+    "url": "https://www.census.gov/quickfacts/",
+    "accessed": "2026-11-24"
+  },
+  "years_from_base_to_2025": {
+    "value": 5.25,
+    "unit": "years, 1 April 2020 to 1 July 2025",
+    "status": "calculated"
+  },
+  "visit_rate": {
+    "value": 1.614,
+    "standard_error": 0.095,
+    "unit": "visits to primary-care physicians per person per year, 2019",
+    "status": "published",
+    "source": "Santo L, Kang K (2023) National Ambulatory Medical Care Survey: 2019 national summary tables, Table 1: 161.4 visits per 100 people (standard error 9.5)",
+    "url": "https://doi.org/10.15620/cdc:123251"
+  },
+  "z_95": {
+    "value": 1.96,
+    "status": "statistical constant for a 95 percent range"
+  },
+  "mobile_share": {
+    "value": 0.15,
+    "unit": "share of primary-care visits that stakeholders assign to the mobile clinics",
+    "status": "planning assumption"
+  },
+  "median_annual_visits_per_clinic": {
+    "value": 3491,
+    "unit": "visits per mobile clinic per year",
+    "status": "published",
+    "source": "Malone NC et al. (2020) Mobile health clinics in the United States. Int J Equity Health 19:40",
+    "url": "https://doi.org/10.1186/s12939-020-1135-7"
+  },
+  "mean_annual_cost_primary_care_clinic": {
+    "value": 981092,
+    "unit": "dollars per primary-care mobile clinic per year (58 clinics reported cost)",
+    "status": "published",
+    "source": "Malone NC et al. (2020) Mobile health clinics in the United States. Int J Equity Health 19:40",
+    "url": "https://doi.org/10.1186/s12939-020-1135-7"
+  },
+  "service_days_per_week": {
+    "value": 5,
+    "unit": "service days of each van per week",
+    "status": "planning assumption"
+  },
+  "budget_per_month": {
+    "value": 330000,
+    "unit": "dollars per month",
+    "status": "stakeholder requirement (critical)"
+  },
+  "critical_coverage": {
+    "value": 0.50,
+    "unit": "coverage in each town",
+    "status": "stakeholder requirement (critical)"
+  },
+  "important_coverage": {
+    "value": 0.80,
+    "unit": "coverage in each town",
+    "status": "stakeholder requirement (important)"
+  },
+  "vans_per_town": {
+    "max": 4,
+    "max_total": 4,
+    "status": "candidate set: a fifth van raises the monthly cost above the budget"
+  },
+  "planning_share_sensitivity": [0.10, 0.15, 0.20]
+}
